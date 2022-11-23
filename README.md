@@ -5,7 +5,7 @@ Utility for creating dummy data for Scala tests
 Add the following line to your build.sbt file:
 
 ```sbt
-libraryDependencies += "com.alejandrohdezma" %% "dummy" % "0.0.0" % Test
+libraryDependencies += "com.alejandrohdezma" %% "dummy" % "0.1.0" % Test
 ```
 
 ## Usage
@@ -32,16 +32,16 @@ under the hood):
 
 ```scala
 dummy.dogs.snoopy
-// res0: UUID = 6bc8b106-04cf-4775-b904-38c3214ed3ce
+// res0: UUID = 11354173-e635-4f2f-a948-e759a46a00f9
 
 dummy.dogs.`santa's-little-helper`
-// res1: UUID = fb5d572b-3710-4d15-b99a-d0d875dc355d
+// res1: UUID = 163948ef-02d2-4468-a0ae-2b145bd217ac
 
 dummy.cats.garfield
-// res2: String = "KnhT0"
+// res2: String = "nVTRT"
 
 dummy.cats.sylvester
-// res3: String = "auKCM"
+// res3: String = "fSSu1"
 ```
 
 The key of these generators is that values are cached, so if we try to use the
@@ -49,16 +49,16 @@ same "key" twice, it will give us the same value:
 
 ```scala
 dummy.dogs.snoopy
-// res4: UUID = 6bc8b106-04cf-4775-b904-38c3214ed3ce
+// res4: UUID = 11354173-e635-4f2f-a948-e759a46a00f9
 
 dummy.dogs.`santa's-little-helper`
-// res5: UUID = fb5d572b-3710-4d15-b99a-d0d875dc355d
+// res5: UUID = 163948ef-02d2-4468-a0ae-2b145bd217ac
 
 dummy.cats.garfield
-// res6: String = "KnhT0"
+// res6: String = "nVTRT"
 
 dummy.cats.sylvester
-// res7: String = "auKCM"
+// res7: String = "fSSu1"
 ```
 
 ## Contributors to this project 
