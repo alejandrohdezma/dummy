@@ -80,9 +80,9 @@ object Dummy {
     *
     *   object dummy {
     *
-    *     case object dogs extends Dummy.WithName(name => s"$name-${UUID.randomUUID()}")
+    *     case object dogs extends Dummy.WithName(name => s"\$name-\${UUID.randomUUID()}")
     *
-    *     case object cats extends Dummy.WithName(name => s"${Random.alphanumeric.take(5).mkString}-$name")
+    *     case object cats extends Dummy.WithName(name => s"\${Random.alphanumeric.take(5).mkString}-\$name")
     *
     *   }
     *   ```
