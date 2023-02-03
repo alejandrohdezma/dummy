@@ -21,7 +21,7 @@ object dummy {
 
   case object dogs extends Dummy(UUID.randomUUID())
 
-  case object cats extends Dummy(Random.alphanumeric.take(5).mkString)
+  case object cats extends Dummy.WithName(name => s"${Random.alphanumeric.take(5).mkString}-$name")
 
 }
 ```
