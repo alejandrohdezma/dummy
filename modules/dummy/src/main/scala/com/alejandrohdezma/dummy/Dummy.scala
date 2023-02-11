@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Alejandro Hernández <https://github.com/alejandrohdezma>
+ * Copyright 2022-2023 Alejandro Hernández <https://github.com/alejandrohdezma>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,5 +60,52 @@ class Dummy[A](creator: => A) extends Dynamic {
   private val cache: ConcurrentHashMap[String, A] = new ConcurrentHashMap[String, A]
 
   def selectDynamic(name: String): A = cache.computeIfAbsent(name, _ => creator)
+
+}
+
+object Dummy {
+
+  /** Utility for creating dummy data for tests.
+    *
+    * @param creator
+    *   The code that should be called to generate a new value of your dummy object depending on the choosen name
+    *
+    * @example
+    *   {{{
+    *   ```scala
+    *   import com.alejandrohdezma.dummy.Dummy
+    *
+    *   import java.util.UUID
+    *   import scala.util.Random
+    *
+    *   object dummy {
+    *
+    *     case object dogs extends Dummy.WithName(name => s"\$name-\${UUID.randomUUID()}")
+    *
+    *     case object cats extends Dummy.WithName(name => s"\${Random.alphanumeric.take(5).mkString}-\$name")
+    *
+    *   }
+    *   ```
+    *
+    *   And then use it in your tests with any value you want:
+    *
+    *   ```scala
+    *   dummy.dogs.snoopy
+    *
+    *   dummy.dogs.`santa's-little-helper`
+    *
+    *   dummy.cats.garfield
+    *
+    *   dummy.cats.sylvester
+    *   ```
+    *   }}}
+    */
+  class WithName[A](creator: String => A) extends Dynamic {
+
+    private val cache: ConcurrentHashMap[String, A] = new ConcurrentHashMap[String, A]
+
+    def selectDynamic(name: String): A = cache.computeIfAbsent(name, creator(_))
+
+  }
 
 }
