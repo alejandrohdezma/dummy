@@ -3,13 +3,14 @@ ThisBuild / scalaVersion       := "2.13.10"
 ThisBuild / crossScalaVersions := Seq("2.12.17", "2.13.10", Scala3)
 ThisBuild / organization       := "com.alejandrohdezma"
 
-addCommandAlias("ci-test", "fix --check; mdoc; +test")
+addCommandAlias("ci-test", "fix --check; mdoc; publishLocal; +test")
 addCommandAlias("ci-docs", "github; mdoc; headerCreateAll")
 addCommandAlias("ci-publish", "github; ci-release")
 
 lazy val documentation = project
   .enablePlugins(MdocPlugin)
   .dependsOn(dummy)
+  .settings(scalacOptions -= "-Wnonunit-statement")
   .settings(mdocOut := file("."))
 
 lazy val dummy = module
