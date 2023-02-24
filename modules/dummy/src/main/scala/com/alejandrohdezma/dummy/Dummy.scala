@@ -57,7 +57,7 @@ import scala.language.dynamics
   */
 class Dummy[A](creator: => A) extends Dynamic {
 
-  private val cache: ConcurrentHashMap[String, A] = new ConcurrentHashMap[String, A]
+  val cache: ConcurrentHashMap[String, A] = new ConcurrentHashMap[String, A]
 
   def selectDynamic(name: String): A = cache.computeIfAbsent(name, _ => creator)
 
@@ -102,7 +102,7 @@ object Dummy {
     */
   class WithName[A](creator: String => A) extends Dynamic {
 
-    private val cache: ConcurrentHashMap[String, A] = new ConcurrentHashMap[String, A]
+    val cache: ConcurrentHashMap[String, A] = new ConcurrentHashMap[String, A]
 
     def selectDynamic(name: String): A = cache.computeIfAbsent(name, creator(_))
 
