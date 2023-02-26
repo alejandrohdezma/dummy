@@ -19,9 +19,9 @@ import scala.util.Random
 
 object dummy {
 
-  case object dogs extends Dummy(UUID.randomUUID())
+  val dogs = new Dummy(UUID.randomUUID())
 
-  case object cats extends Dummy.WithName(name => s"${Random.alphanumeric.take(5).mkString}-$name")
+  val cats = new Dummy.WithName(name => s"${Random.alphanumeric.take(5).mkString}-$name")
 
 }
 ```

@@ -33,9 +33,9 @@ import scala.language.dynamics
   *
   *   object dummy {
   *
-  *     case object dogs extends Dummy(UUID.randomUUID())
+  *     val dogs = new Dummy(UUID.randomUUID())
   *
-  *     case object cats extends Dummy(Random.alphanumeric.take(5).mkString)
+  *     val cats = new Dummy(Random.alphanumeric.take(5).mkString)
   *
   *   }
   *   ```
@@ -79,9 +79,9 @@ object Dummy {
     *
     *   object dummy {
     *
-    *     case object dogs extends Dummy.WithName(name => s"\$name-\${UUID.randomUUID()}")
+    *     val dogs = new Dummy.WithName(name => s"\$name-\${UUID.randomUUID()}")
     *
-    *     case object cats extends Dummy.WithName(name => s"\${Random.alphanumeric.take(5).mkString}-\$name")
+    *     val cats = new Dummy.WithName(name => s"\${Random.alphanumeric.take(5).mkString}-\$name")
     *
     *   }
     *   ```
