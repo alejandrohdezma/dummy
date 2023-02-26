@@ -5,7 +5,7 @@ Utility for creating dummy data for Scala tests
 Add the following line to your build.sbt file:
 
 ```sbt
-libraryDependencies += "com.alejandrohdezma" %% "dummy" % "0.2.0" % Test
+libraryDependencies += "com.alejandrohdezma" %% "dummy" % "0.3.0" % Test
 ```
 
 ## Usage
@@ -19,9 +19,9 @@ import scala.util.Random
 
 object dummy {
 
-  case object dogs extends Dummy(UUID.randomUUID())
+  val dogs = Dummy(UUID.randomUUID())
 
-  case object cats extends Dummy.WithName(name => s"${Random.alphanumeric.take(5).mkString}-$name")
+  val cats = Dummy.withName(name => s"${Random.alphanumeric.take(5).mkString}-$name")
 
 }
 ```
@@ -32,16 +32,16 @@ under the hood):
 
 ```scala
 dummy.dogs.snoopy
-// res0: UUID = 5abf3e53-a021-463f-91f7-3978306b79a6
+// res0: UUID = d1d49a7e-fa32-4a36-9945-bbd8782075e8
 
 dummy.dogs.`santa's-little-helper`
-// res1: UUID = fa087ff5-1c8a-475b-abe2-0815ad4e1907
+// res1: UUID = b3c4d4b7-7d9b-4912-bb35-e8194a995439
 
 dummy.cats.garfield
-// res2: String = "BMUz3-garfield"
+// res2: String = "GWlgO-garfield"
 
 dummy.cats.sylvester
-// res3: String = "1N4hG-sylvester"
+// res3: String = "U1wAG-sylvester"
 ```
 
 The key of these generators is that values are cached, so if we try to use the
@@ -49,16 +49,35 @@ same "key" twice, it will give us the same value:
 
 ```scala
 dummy.dogs.snoopy
-// res4: UUID = 5abf3e53-a021-463f-91f7-3978306b79a6
+// res4: UUID = d1d49a7e-fa32-4a36-9945-bbd8782075e8
 
 dummy.dogs.`santa's-little-helper`
-// res5: UUID = fa087ff5-1c8a-475b-abe2-0815ad4e1907
+// res5: UUID = b3c4d4b7-7d9b-4912-bb35-e8194a995439
 
 dummy.cats.garfield
-// res6: String = "BMUz3-garfield"
+// res6: String = "GWlgO-garfield"
 
 dummy.cats.sylvester
-// res7: String = "1N4hG-sylvester"
+// res7: String = "U1wAG-sylvester"
+```
+
+### Accessing the cache
+
+You can access the internal `Dummy` cache to see the values in
+store.
+
+```scala
+dummy.dogs.cache.all
+// res8: Map[String, UUID] = Map(
+//   "snoopy" -> d1d49a7e-fa32-4a36-9945-bbd8782075e8,
+//   "santa's-little-helper" -> b3c4d4b7-7d9b-4912-bb35-e8194a995439
+// )
+
+dummy.cats.cache.all
+// res9: Map[String, String] = Map(
+//   "sylvester" -> "U1wAG-sylvester",
+//   "garfield" -> "GWlgO-garfield"
+// )
 ```
 
 ## Contributors to this project 
