@@ -33,9 +33,9 @@ import scala.language.dynamics
   *
   *   object dummy {
   *
-  *     case object dogs extends Dummy(UUID.randomUUID())
+  *     val dogs = new Dummy(UUID.randomUUID())
   *
-  *     case object cats extends Dummy(Random.alphanumeric.take(5).mkString)
+  *     val cats = new Dummy(Random.alphanumeric.take(5).mkString)
   *
   *   }
   *   ```
@@ -64,10 +64,7 @@ class Dummy[A](creator: => A) extends Dynamic {
 
 object Dummy {
 
-  /** Utility for creating dummy data for tests.
-    *
-    * @param creator
-    *   The code that should be called to generate a new value of your dummy object depending on the choosen name
+  /** Creates a "dummy" object that allows generating dummy values for tests easily.
     *
     * @example
     *   {{{
@@ -79,9 +76,9 @@ object Dummy {
     *
     *   object dummy {
     *
-    *     case object dogs extends Dummy.WithName(name => s"\$name-\${UUID.randomUUID()}")
+    *     val dogs = Dummy(UUID.randomUUID())
     *
-    *     case object cats extends Dummy.WithName(name => s"\${Random.alphanumeric.take(5).mkString}-\$name")
+    *     val cats = Dummy(Random.alphanumeric.take(5).mkString)
     *
     *   }
     *   ```
@@ -99,7 +96,81 @@ object Dummy {
     *   ```
     *   }}}
     */
-  class WithName[A](creator: String => A) extends Dynamic {
+  def apply[A](creator: => A): Dummy[A] = new Dummy(creator)
+
+  /** Creates a "dummy" object that allows generating dummy values for tests easily.
+    *
+    * @param creator
+    *   The code that should be called to generate a new value of your dummy object depending on the choosen name
+    *
+    * @example
+    *   {{{
+    *   ```scala
+    *   import com.alejandrohdezma.dummy.Dummy
+    *
+    *   import java.util.UUID
+    *   import scala.util.Random
+    *
+    *   object dummy {
+    *
+    *     val dogs = Dummy.withName(name => s"\$name-\${UUID.randomUUID()}")
+    *
+    *     val cats = Dummy.withName(name => s"\${Random.alphanumeric.take(5).mkString}-\$name")
+    *
+    *   }
+    *   ```
+    *
+    *   And then use it in your tests with any value you want:
+    *
+    *   ```scala
+    *   dummy.dogs.snoopy
+    *
+    *   dummy.dogs.`santa's-little-helper`
+    *
+    *   dummy.cats.garfield
+    *
+    *   dummy.cats.sylvester
+    *   ```
+    *   }}}
+    */
+  def withName[A](creator: String => A): Dummy.WithName[A] = new Dummy.WithName[A](creator)
+
+  /** Utility for creating dummy data for tests.
+    *
+    * @param creator
+    *   The code that should be called to generate a new value of your dummy object depending on the choosen name
+    *
+    * @example
+    *   {{{
+    *   ```scala
+    *   import com.alejandrohdezma.dummy.Dummy
+    *
+    *   import java.util.UUID
+    *   import scala.util.Random
+    *
+    *   object dummy {
+    *
+    *     val dogs = Dummy.withName(name => s"\$name-\${UUID.randomUUID()}")
+    *
+    *     val cats = Dummy.withName(name => s"\${Random.alphanumeric.take(5).mkString}-\$name")
+    *
+    *   }
+    *   ```
+    *
+    *   And then use it in your tests with any value you want:
+    *
+    *   ```scala
+    *   dummy.dogs.snoopy
+    *
+    *   dummy.dogs.`santa's-little-helper`
+    *
+    *   dummy.cats.garfield
+    *
+    *   dummy.cats.sylvester
+    *   ```
+    *   }}}
+    */
+  final case class WithName[A](creator: String => A) extends Dynamic {
 
     /** The cache containing all the values created by this dummy object. */
     val cache: Cache[A] = Cache.fromConcurrentHashMap[A]

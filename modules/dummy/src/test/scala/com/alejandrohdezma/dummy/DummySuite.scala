@@ -7,7 +7,7 @@ import munit.FunSuite
 class DummySuite extends FunSuite {
 
   test("Dummy always return the same value from the same key") {
-    val dummy = new Dummy(s"${UUID.randomUUID()}")
+    val dummy = Dummy(s"${UUID.randomUUID()}")
 
     val a = List.fill(10)(dummy.a).distinct
 
