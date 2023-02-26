@@ -19,9 +19,9 @@ import scala.util.Random
 
 object dummy {
 
-  val dogs = new Dummy(UUID.randomUUID())
+  val dogs = Dummy(UUID.randomUUID())
 
-  val cats = new Dummy.WithName(name => s"${Random.alphanumeric.take(5).mkString}-$name")
+  val cats = Dummy.withName(name => s"${Random.alphanumeric.take(5).mkString}-$name")
 
 }
 ```
