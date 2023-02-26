@@ -53,6 +53,17 @@ dummy.cats.garfield
 dummy.cats.sylvester
 ```
 
+### Accessing the cache
+
+You can access the internal `Dummy` cache to see the values in
+store.
+
+```scala mdoc
+dummy.dogs.cache.all
+
+dummy.cats.cache.all
+```
+
 ## Contributors to this project 
 
 @CONTRIBUTORS_TABLE@

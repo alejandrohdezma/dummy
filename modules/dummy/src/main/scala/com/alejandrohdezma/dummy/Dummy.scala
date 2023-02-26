@@ -16,8 +16,6 @@
 
 package com.alejandrohdezma.dummy
 
-import java.util.concurrent.ConcurrentHashMap
-
 import scala.language.dynamics
 
 /** Utility for creating dummy data for tests.
@@ -57,9 +55,10 @@ import scala.language.dynamics
   */
 class Dummy[A](creator: => A) extends Dynamic {
 
-  private val cache: ConcurrentHashMap[String, A] = new ConcurrentHashMap[String, A]
+  /** The cache containing all the values created by this dummy object. */
+  val cache: Cache[A] = Cache.fromConcurrentHashMap[A]
 
-  def selectDynamic(name: String): A = cache.computeIfAbsent(name, _ => creator)
+  def selectDynamic(name: String): A = cache.getOrSet(name, _ => creator)
 
 }
 
@@ -102,9 +101,10 @@ object Dummy {
     */
   class WithName[A](creator: String => A) extends Dynamic {
 
-    private val cache: ConcurrentHashMap[String, A] = new ConcurrentHashMap[String, A]
+    /** The cache containing all the values created by this dummy object. */
+    val cache: Cache[A] = Cache.fromConcurrentHashMap[A]
 
-    def selectDynamic(name: String): A = cache.computeIfAbsent(name, creator(_))
+    def selectDynamic(name: String): A = cache.getOrSet(name, creator)
 
   }
 
