@@ -14,3 +14,4 @@ lazy val documentation = project
   .settings(mdocOut := file("."))
 
 lazy val dummy = module
+  .settings(libraryDependencies += "org.scalameta" %% "munit" % "0.7.29" % Test)
