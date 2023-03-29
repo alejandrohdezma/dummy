@@ -16,7 +16,11 @@
 
 package com.alejandrohdezma.dummy
 
+import java.time.Instant
+
 import scala.language.dynamics
+
+import org.ocpsoft.prettytime.nlp.PrettyTimeParser
 
 /** Utility for creating dummy data for tests.
   *
@@ -134,6 +138,43 @@ object Dummy {
     *   }}}
     */
   def withName[A](creator: String => A): Dummy.WithName[A] = new Dummy.WithName[A](creator)
+
+  /** Creates a "dummy" object that allows generating dummy instant values from natural language for tests easily.
+    *
+    * @example
+    *   {{{
+    *   ```scala
+    *   import com.alejandrohdezma.dummy.Dummy
+    *
+    *   object dummy {
+    *
+    *     val dates = Dummy.fromNaturalLanguageDate()
+    *
+    *   }
+    *   ```
+    *
+    *   And then use it in your tests with any value you want:
+    *
+    *   ```scala
+    *   dummy.dates.`5 days ago`
+    *
+    *   dummy.dates.`yesterday`
+    *
+    *   dummy.dates.`last year`
+    *
+    *   dummy.dates.`next tuesday`
+    *   ```
+    *   }}}
+    */
+  def fromNaturalLanguageDate(): Dummy.WithName[Instant] = withName[Instant] { text =>
+    val date = new PrettyTimeParser().parse(text)
+
+    if (date.isEmpty()) {
+      sys.error(s"Unable to parse `$text` as a date")
+    }
+
+    date.get(0).toInstant()
+  }
 
   /** Utility for creating dummy data for tests.
     *

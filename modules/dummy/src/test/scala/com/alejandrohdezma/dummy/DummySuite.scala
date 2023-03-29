@@ -16,6 +16,11 @@
 
 package com.alejandrohdezma.dummy
 
+import java.time.DayOfWeek.TUESDAY
+import java.time.Instant
+import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit._
+import java.time.temporal.TemporalAdjusters.next
 import java.util.UUID
 
 import munit.FunSuite
@@ -48,6 +53,28 @@ class DummySuite extends FunSuite {
 
     assertEquals(b.size, 1)
     assertEquals(s"b-${UUID.fromString(b.head.drop(2))}", b.head)
+  }
+
+  test("Dummy.fromNaturalLanguageDate allows creating dummy values from natural language") {
+    val dummy = Dummy.fromNaturalLanguageDate()
+
+    def assertInstant(obtained: Instant, expected: Instant) =
+      assertEquals(obtained.truncatedTo(DAYS), expected.truncatedTo(DAYS))
+
+    val now = Instant.now()
+
+    assertInstant(dummy.`5 days ago`, now.minus(5, DAYS))
+    assertInstant(dummy.`yesterday`, now.minus(1, DAYS))
+    assertInstant(dummy.`last year`, ZonedDateTime.now().minusYears(1).toInstant)
+    assertInstant(dummy.`next tuesday`, ZonedDateTime.now().`with`(next(TUESDAY)).toInstant())
+  }
+
+  test("Dummy.fromNaturalLanguageDate fails if provided expression is not correct") {
+    val dummy = Dummy.fromNaturalLanguageDate()
+
+    interceptMessage[RuntimeException]("Unable to parse `this is not valid` as a date") {
+      dummy.`this is not valid`
+    }
   }
 
 }

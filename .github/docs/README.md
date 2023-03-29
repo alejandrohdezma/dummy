@@ -23,6 +23,8 @@ object dummy {
 
   val cats = Dummy.withName(name => s"${Random.alphanumeric.take(5).mkString}-$name")
 
+  val dates = Dummy.fromNaturalLanguageDate()
+
 }
 ```
 
@@ -38,6 +40,10 @@ dummy.dogs.`santa's-little-helper`
 dummy.cats.garfield
 
 dummy.cats.sylvester
+
+dummy.dates.`3 days ago`
+
+dummy.dates.yesterday
 ```
 
 The key of these generators is that values are cached, so if we try to use the
@@ -51,6 +57,10 @@ dummy.dogs.`santa's-little-helper`
 dummy.cats.garfield
 
 dummy.cats.sylvester
+
+dummy.dates.`3 days ago`
+
+dummy.dates.yesterday
 ```
 
 ### Accessing the cache
@@ -62,6 +72,8 @@ store.
 dummy.dogs.cache.all
 
 dummy.cats.cache.all
+
+dummy.dates.cache.all
 ```
 
 ## Contributors to this project 
