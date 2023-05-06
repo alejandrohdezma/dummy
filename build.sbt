@@ -10,10 +10,8 @@ addCommandAlias("ci-publish", "github; ci-release")
 lazy val documentation = project
   .enablePlugins(MdocPlugin)
   .dependsOn(dummy)
-  .settings(scalacOptions -= "-Wnonunit-statement")
-  .settings(mdocOut := file("."))
 
 lazy val dummy = module
   .settings(libraryDependencies += "org.ocpsoft.prettytime" % "prettytime-nlp" % "5.0.6.Final")
   .settings(libraryDependencies += "org.scalameta" %% "munit" % "0.7.29" % Test)
-  .settings(libraryDependencies += "org.scala-lang.modules" %% "scala-collection-compat" % "2.9.0")
+  .settings(libraryDependencies += "org.scala-lang.modules" %% "scala-collection-compat" % "2.10.0")
