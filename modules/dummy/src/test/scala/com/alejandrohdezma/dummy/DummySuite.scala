@@ -36,9 +36,11 @@ class DummySuite extends FunSuite {
 
     assertEquals(a.size, 1)
     assertEquals(s"${UUID.fromString(a.head)}", a.head)
+    assertEquals(dummy("a"), a.head)
 
     assertEquals(b.size, 1)
     assertEquals(s"${UUID.fromString(b.head)}", b.head)
+    assertEquals(dummy("b"), b.head)
   }
 
   test("Dummy.WithName always return the same value from the same key") {
@@ -50,9 +52,11 @@ class DummySuite extends FunSuite {
 
     assertEquals(a.size, 1)
     assertEquals(s"a-${UUID.fromString(a.head.drop(2))}", a.head)
+    assertEquals(dummy("a"), a.head)
 
     assertEquals(b.size, 1)
     assertEquals(s"b-${UUID.fromString(b.head.drop(2))}", b.head)
+    assertEquals(dummy("b"), b.head)
   }
 
   test("Dummy.fromNaturalLanguageDate allows creating dummy values from natural language") {
@@ -64,9 +68,13 @@ class DummySuite extends FunSuite {
     val now = Instant.now()
 
     assertInstant(dummy.`5 days ago`, now.minus(5, DAYS))
+    assertInstant(dummy("5 days ago"), now.minus(5, DAYS))
     assertInstant(dummy.`yesterday`, now.minus(1, DAYS))
+    assertInstant(dummy("yesterday"), now.minus(1, DAYS))
     assertInstant(dummy.`last year`, ZonedDateTime.now().minusYears(1).toInstant)
+    assertInstant(dummy("last year"), ZonedDateTime.now().minusYears(1).toInstant)
     assertInstant(dummy.`next tuesday`, ZonedDateTime.now().`with`(next(TUESDAY)).toInstant())
+    assertInstant(dummy("next tuesday"), ZonedDateTime.now().`with`(next(TUESDAY)).toInstant())
   }
 
   test("Dummy.fromNaturalLanguageDate fails if provided expression is not correct") {
