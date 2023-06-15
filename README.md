@@ -5,7 +5,7 @@ Utility for creating dummy data for Scala tests
 Add the following line to your build.sbt file:
 
 ```sbt
-libraryDependencies += "com.alejandrohdezma" %% "dummy" % "0.4.0" % Test
+libraryDependencies += "com.alejandrohdezma" %% "dummy" % "0.5.0" % Test
 ```
 
 ## Usage
@@ -34,22 +34,22 @@ under the hood):
 
 ```scala
 dummy.dogs.snoopy
-// res0: UUID = b427756c-d747-46c7-bacd-8297b7a6e94b
+// res0: UUID = 574cd474-a682-4504-8429-e47812ce42db
 
 dummy.dogs.`santa's-little-helper`
-// res1: UUID = 92b79d40-8792-4253-935f-5383fd38b286
+// res1: UUID = de112ce6-2c09-43f0-9cef-ae24b4f44310
 
 dummy.cats.garfield
-// res2: String = "5kQkL-garfield"
+// res2: String = "zfRmm-garfield"
 
 dummy.cats.sylvester
-// res3: String = "fH9sa-sylvester"
+// res3: String = "PT9Mg-sylvester"
 
 dummy.dates.`3 days ago`
-// res4: java.time.Instant = 2023-03-26T13:10:16.400Z
+// res4: java.time.Instant = 2023-06-12T13:21:12.846Z
 
 dummy.dates.yesterday
-// res5: java.time.Instant = 2023-03-28T13:10:16.701Z
+// res5: java.time.Instant = 2023-06-14T13:21:13.218Z
 ```
 
 The key of these generators is that values are cached, so if we try to use the
@@ -57,22 +57,22 @@ same "key" twice, it will give us the same value:
 
 ```scala
 dummy.dogs.snoopy
-// res6: UUID = b427756c-d747-46c7-bacd-8297b7a6e94b
+// res6: UUID = 574cd474-a682-4504-8429-e47812ce42db
 
 dummy.dogs.`santa's-little-helper`
-// res7: UUID = 92b79d40-8792-4253-935f-5383fd38b286
+// res7: UUID = de112ce6-2c09-43f0-9cef-ae24b4f44310
 
 dummy.cats.garfield
-// res8: String = "5kQkL-garfield"
+// res8: String = "zfRmm-garfield"
 
 dummy.cats.sylvester
-// res9: String = "fH9sa-sylvester"
+// res9: String = "PT9Mg-sylvester"
 
 dummy.dates.`3 days ago`
-// res10: java.time.Instant = 2023-03-26T13:10:16.400Z
+// res10: java.time.Instant = 2023-06-12T13:21:12.846Z
 
 dummy.dates.yesterday
-// res11: java.time.Instant = 2023-03-28T13:10:16.701Z
+// res11: java.time.Instant = 2023-06-14T13:21:13.218Z
 ```
 
 ### Accessing the cache
@@ -83,20 +83,20 @@ store.
 ```scala
 dummy.dogs.cache.all
 // res12: Map[String, UUID] = Map(
-//   "snoopy" -> b427756c-d747-46c7-bacd-8297b7a6e94b,
-//   "santa's-little-helper" -> 92b79d40-8792-4253-935f-5383fd38b286
+//   "snoopy" -> 574cd474-a682-4504-8429-e47812ce42db,
+//   "santa's-little-helper" -> de112ce6-2c09-43f0-9cef-ae24b4f44310
 // )
 
 dummy.cats.cache.all
 // res13: Map[String, String] = Map(
-//   "sylvester" -> "fH9sa-sylvester",
-//   "garfield" -> "5kQkL-garfield"
+//   "sylvester" -> "PT9Mg-sylvester",
+//   "garfield" -> "zfRmm-garfield"
 // )
 
 dummy.dates.cache.all
 // res14: Map[String, java.time.Instant] = Map(
-//   "yesterday" -> 2023-03-28T13:10:16.701Z,
-//   "3 days ago" -> 2023-03-26T13:10:16.400Z
+//   "yesterday" -> 2023-06-14T13:21:13.218Z,
+//   "3 days ago" -> 2023-06-12T13:21:12.846Z
 // )
 ```
 
