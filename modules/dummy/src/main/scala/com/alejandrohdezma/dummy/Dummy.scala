@@ -64,6 +64,8 @@ class Dummy[A](creator: => A) extends Dynamic {
 
   def selectDynamic(name: String): A = cache.getOrSet(name, _ => creator)
 
+  def apply(name: String): A = selectDynamic(name)
+
 }
 
 object Dummy {
@@ -217,6 +219,8 @@ object Dummy {
     val cache: Cache[A] = Cache.fromConcurrentHashMap[A]
 
     def selectDynamic(name: String): A = cache.getOrSet(name, creator)
+
+    def apply(name: String): A = selectDynamic(name)
 
   }
 
