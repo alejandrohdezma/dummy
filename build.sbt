@@ -1,6 +1,6 @@
 val Scala3 = "3.1.3" // scala-steward:off
 ThisBuild / scalaVersion       := "2.13.10"
-ThisBuild / crossScalaVersions := Seq("2.12.17", "2.13.10", Scala3)
+ThisBuild / crossScalaVersions := Seq("2.12.18", "2.13.10", Scala3)
 ThisBuild / organization       := "com.alejandrohdezma"
 
 addCommandAlias("ci-test", "fix --check; mdoc; publishLocal; +test")
