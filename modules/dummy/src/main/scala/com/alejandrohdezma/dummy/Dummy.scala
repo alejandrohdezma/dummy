@@ -66,6 +66,8 @@ class Dummy[A](creator: => A) extends Dynamic {
 
   def apply(name: String): A = selectDynamic(name)
 
+  def map[B](f: A => B): Dummy[B] = Dummy(f(creator))
+
 }
 
 object Dummy {
@@ -221,6 +223,8 @@ object Dummy {
     def selectDynamic(name: String): A = cache.getOrSet(name, creator)
 
     def apply(name: String): A = selectDynamic(name)
+
+    def map[B](f: A => B): Dummy.WithName[B] = Dummy.WithName(creator.andThen(f))
 
   }
 

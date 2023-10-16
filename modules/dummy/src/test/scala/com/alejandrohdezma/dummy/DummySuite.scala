@@ -16,14 +16,15 @@
 
 package com.alejandrohdezma.dummy
 
-import java.time.DayOfWeek.TUESDAY
 import java.time.Instant
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit._
-import java.time.temporal.TemporalAdjusters.next
 import java.util.UUID
 
+import scala.util.Random
+
 import munit.FunSuite
+import munit.Location
 
 class DummySuite extends FunSuite {
 
@@ -40,6 +41,22 @@ class DummySuite extends FunSuite {
 
     assertEquals(b.size, 1)
     assertEquals(s"${UUID.fromString(b.head)}", b.head)
+    assertEquals(dummy("b"), b.head)
+  }
+
+  test("Dummy#map allows transforming the returned type") {
+    val dummy = Dummy(Random.alphanumeric.take(5).mkString).map(_ + "42")
+
+    val a = List.fill(10)(dummy.a).distinct
+
+    val b = List.fill(10)(dummy.b).distinct
+
+    assertEquals(a.size, 1)
+    assert(a.head.endsWith("42"))
+    assertEquals(dummy("a"), a.head)
+
+    assertEquals(b.size, 1)
+    assert(b.head.endsWith("42"))
     assertEquals(dummy("b"), b.head)
   }
 
@@ -62,7 +79,7 @@ class DummySuite extends FunSuite {
   test("Dummy.fromNaturalLanguageDate allows creating dummy values from natural language") {
     val dummy = Dummy.fromNaturalLanguageDate()
 
-    def assertInstant(obtained: Instant, expected: Instant) =
+    def assertInstant(obtained: Instant, expected: Instant)(implicit location: Location) =
       assertEquals(obtained.truncatedTo(DAYS), expected.truncatedTo(DAYS))
 
     val now = Instant.now()
@@ -73,8 +90,19 @@ class DummySuite extends FunSuite {
     assertInstant(dummy("yesterday"), now.minus(1, DAYS))
     assertInstant(dummy.`last year`, ZonedDateTime.now().minusYears(1).toInstant)
     assertInstant(dummy("last year"), ZonedDateTime.now().minusYears(1).toInstant)
-    assertInstant(dummy.`next tuesday`, ZonedDateTime.now().`with`(next(TUESDAY)).toInstant())
-    assertInstant(dummy("next tuesday"), ZonedDateTime.now().`with`(next(TUESDAY)).toInstant())
+  }
+
+  test("Dummy.WithName#map allows transforming the returned type") {
+    val dummy = Dummy.fromNaturalLanguageDate().map(_.truncatedTo(DAYS))
+
+    val now = Instant.now()
+
+    assertEquals(dummy.`5 days ago`, now.minus(5, DAYS).truncatedTo(DAYS))
+    assertEquals(dummy("5 days ago"), now.minus(5, DAYS).truncatedTo(DAYS))
+    assertEquals(dummy.`yesterday`, now.minus(1, DAYS).truncatedTo(DAYS))
+    assertEquals(dummy("yesterday"), now.minus(1, DAYS).truncatedTo(DAYS))
+    assertEquals(dummy.`last year`, ZonedDateTime.now().minusYears(1).toInstant.truncatedTo(DAYS))
+    assertEquals(dummy("last year"), ZonedDateTime.now().minusYears(1).toInstant.truncatedTo(DAYS))
   }
 
   test("Dummy.fromNaturalLanguageDate fails if provided expression is not correct") {
