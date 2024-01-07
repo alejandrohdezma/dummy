@@ -12,5 +12,4 @@ lazy val documentation = project
   .dependsOn(dummy)
 
 lazy val dummy = module
-  .settings(libraryDependencies += "org.ocpsoft.prettytime" % "prettytime-nlp" % "5.0.7.Final")
   .settings(libraryDependencies += "org.scalameta" %% "munit" % "0.7.29" % Test)
