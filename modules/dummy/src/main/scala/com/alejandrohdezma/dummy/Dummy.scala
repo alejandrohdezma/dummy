@@ -17,10 +17,12 @@
 package com.alejandrohdezma.dummy
 
 import java.time.Instant
+import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
+import java.time.temporal.ChronoUnit._
+import java.time.temporal.TemporalUnit
 
 import scala.language.dynamics
-
-import org.ocpsoft.prettytime.nlp.PrettyTimeParser
 
 /** Utility for creating dummy data for tests.
   *
@@ -145,39 +147,68 @@ object Dummy {
 
   /** Creates a "dummy" object that allows generating dummy instant values from natural language for tests easily.
     *
+    * Allowed values are:
+    *
+    *   - `yesterday` / `tomorrow`
+    *   - `N UNIT ago/forward`
+    *   - `next/last UNIT`
+    *
+    * N will always be a positive number
+    *
+    * UNIT will always be a Java `ChronoUnit` in lowercase (singular or plural)
+    *
     * @example
     *   {{{
-    *   ```scala
-    *   import com.alejandrohdezma.dummy.Dummy
+    *    ```scala
+    *    import com.alejandrohdezma.dummy.Dummy
     *
-    *   object dummy {
+    *    object dummy {
     *
-    *     val dates = Dummy.fromNaturalLanguageDate()
+    *      val dates = Dummy.fromNaturalLanguageDate()
     *
-    *   }
-    *   ```
+    *    }
     *
-    *   And then use it in your tests with any value you want:
-    *
-    *   ```scala
-    *   dummy.dates.`5 days ago`
-    *
-    *   dummy.dates.`yesterday`
-    *
-    *   dummy.dates.`last year`
-    *
-    *   dummy.dates.`next tuesday`
-    *   ```
+    *    dummy.dates.`5 days ago`
+    *    dummy.dates.`yesterday`
+    *    dummy.dates.`last year`
+    *    ```
     *   }}}
     */
-  def fromNaturalLanguageDate(): Dummy.WithName[Instant] = withName[Instant] { text =>
-    val date = new PrettyTimeParser().parse(text)
+  def fromNaturalLanguageDate(): Dummy.WithName[Instant] = withName {
+    case s"${Number(quantity)} ${TimeUnit(unit)} ago"     => ZonedDateTime.now().minus(quantity, unit)
+    case s"${Number(quantity)} ${TimeUnit(unit)} forward" => ZonedDateTime.now().plus(quantity, unit)
+    case "yesterday"                                      => ZonedDateTime.now().minus(1, DAYS)
+    case "tomorrow"                                       => ZonedDateTime.now().plus(1, DAYS)
+    case s"next ${TimeUnit(unit)}"                        => ZonedDateTime.now().plus(1, unit)
+    case s"last ${TimeUnit(unit)}"                        => ZonedDateTime.now().minus(1, unit)
+    case string                                           => throw IllegalDateException(string) // scalafix:ok
+  }.map(_.toInstant())
 
-    if (date.isEmpty()) {
-      sys.error(s"Unable to parse `$text` as a date")
+  final case class IllegalDateException(string: String)
+      extends RuntimeException(s"Unable to convert `$string` to a valid instant")
+
+  object Number {
+
+    def unapply(string: String): Option[Long] = string.toLongOption
+
+  }
+
+  object TimeUnit {
+
+    def unapply(string: String): Option[TemporalUnit] = string.toLowerCase match {
+      case "nanos" | "nano"     => Some(ChronoUnit.NANOS)
+      case "micros" | "micro"   => Some(ChronoUnit.MICROS)
+      case "millis" | "milli"   => Some(ChronoUnit.MILLIS)
+      case "seconds" | "second" => Some(ChronoUnit.SECONDS)
+      case "minutes" | "minute" => Some(ChronoUnit.MINUTES)
+      case "hours" | "hour"     => Some(ChronoUnit.HOURS)
+      case "days" | "day"       => Some(ChronoUnit.DAYS)
+      case "weeks" | "week"     => Some(ChronoUnit.WEEKS)
+      case "months" | "month"   => Some(ChronoUnit.MONTHS)
+      case "years" | "year"     => Some(ChronoUnit.YEARS)
+      case _                    => None
     }
 
-    date.get(0).toInstant()
   }
 
   /** Utility for creating dummy data for tests.

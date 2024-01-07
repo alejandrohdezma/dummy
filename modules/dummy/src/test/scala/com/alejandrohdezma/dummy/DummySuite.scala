@@ -108,7 +108,7 @@ class DummySuite extends FunSuite {
   test("Dummy.fromNaturalLanguageDate fails if provided expression is not correct") {
     val dummy = Dummy.fromNaturalLanguageDate()
 
-    interceptMessage[RuntimeException]("Unable to parse `this is not valid` as a date") {
+    interceptMessage[Dummy.IllegalDateException]("Unable to convert `this is not valid` to a valid instant") {
       dummy.`this is not valid`
     }
   }

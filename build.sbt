@@ -1,6 +1,6 @@
 val Scala3 = "3.1.3" // scala-steward:off
 ThisBuild / scalaVersion       := "2.13.12"
-ThisBuild / crossScalaVersions := Seq("2.12.18", "2.13.12", Scala3)
+ThisBuild / crossScalaVersions := Seq("2.13.12", Scala3)
 ThisBuild / organization       := "com.alejandrohdezma"
 
 addCommandAlias("ci-test", "fix --check; mdoc; publishLocal; +test")
@@ -12,6 +12,4 @@ lazy val documentation = project
   .dependsOn(dummy)
 
 lazy val dummy = module
-  .settings(libraryDependencies += "org.ocpsoft.prettytime" % "prettytime-nlp" % "5.0.7.Final")
   .settings(libraryDependencies += "org.scalameta" %% "munit" % "0.7.29" % Test)
-  .settings(libraryDependencies += "org.scala-lang.modules" %% "scala-collection-compat" % "2.11.0")
