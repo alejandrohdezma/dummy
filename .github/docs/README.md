@@ -76,6 +76,15 @@ dummy.cats.cache.all
 dummy.dates.cache.all
 ```
 
+There are also available some convenient methods to get values from the cache
+based on their name or value:
+
+
+```scala mdoc
+dummy.dogs.withName("snoopy")
+dummy.cats.withValue(_.endsWith("garfield"))
+```
+
 ## Contributors to this project 
 
 @CONTRIBUTORS_TABLE@

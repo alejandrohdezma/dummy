@@ -60,6 +60,38 @@ class DummySuite extends FunSuite {
     assertEquals(dummy("b"), b.head)
   }
 
+  test("Dummy#withName returns the value with the provided name") {
+    val dummy = Dummy(Random.alphanumeric.take(5).mkString)
+
+    val a = dummy.`a`
+
+    assertEquals(dummy.withName("a"), a)
+  }
+
+  test("Dummy#withName throws error if no value can be found with that name") {
+    val dummy = Dummy(Random.alphanumeric.take(5).mkString)
+
+    interceptMessage[Dummy.NameNotFound.type]("Unable to find value with the provided name") {
+      dummy.withName("a")
+    }
+  }
+
+  test("Dummy.withValue returns the value that satisfies the predicate") {
+    val dummy = Dummy(2)
+
+    val a = dummy.`a`
+
+    assertEquals(dummy.withValue(_ >= 2), a)
+  }
+
+  test("Dummy#withValue throws error if no value can be found with that name") {
+    val dummy = Dummy(5)
+
+    interceptMessage[Dummy.ValueNotFound.type]("Unable to find value that satisfies the provided predicate") {
+      dummy.withValue(_ >= 2)
+    }
+  }
+
   test("Dummy.WithName always return the same value from the same key") {
     val dummy = new Dummy.WithName(key => s"$key-${UUID.randomUUID()}")
 
@@ -103,6 +135,38 @@ class DummySuite extends FunSuite {
     assertEquals(dummy("yesterday"), now.minus(1, DAYS).truncatedTo(DAYS))
     assertEquals(dummy.`last year`, ZonedDateTime.now().minusYears(1).toInstant.truncatedTo(DAYS))
     assertEquals(dummy("last year"), ZonedDateTime.now().minusYears(1).toInstant.truncatedTo(DAYS))
+  }
+
+  test("Dummy.WithName#withName returns the value with the provided name") {
+    val dummy = Dummy.withName(_ => Random.alphanumeric.take(5).mkString)
+
+    val a = dummy.`a`
+
+    assertEquals(dummy.withName("a"), a)
+  }
+
+  test("Dummy.WithName#withName throws error if no value can be found with that name") {
+    val dummy = Dummy.withName(_ => Random.alphanumeric.take(5).mkString)
+
+    interceptMessage[Dummy.NameNotFound.type]("Unable to find value with the provided name") {
+      dummy.withName("a")
+    }
+  }
+
+  test("Dummy.WithName.withValue returns the value that satisfies the predicate") {
+    val dummy = Dummy.withName(_ => 2)
+
+    val a = dummy.`a`
+
+    assertEquals(dummy.withValue(_ >= 2), a)
+  }
+
+  test("Dummy.WithName#withValue throws error if no value can be found with that name") {
+    val dummy = Dummy.withName(_ => 5)
+
+    interceptMessage[Dummy.ValueNotFound.type]("Unable to find value that satisfies the provided predicate") {
+      dummy.withValue(_ >= 2)
+    }
   }
 
   test("Dummy.fromNaturalLanguageDate fails if provided expression is not correct") {
