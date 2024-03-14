@@ -5,7 +5,7 @@ Utility for creating dummy data for Scala tests
 Add the following line to your build.sbt file:
 
 ```sbt
-libraryDependencies += "com.alejandrohdezma" %% "dummy" % "0.6.0" % Test
+libraryDependencies += "com.alejandrohdezma" %% "dummy" % "0.6.1" % Test
 ```
 
 ## Usage
@@ -34,22 +34,22 @@ under the hood):
 
 ```scala
 dummy.dogs.snoopy
-// res0: UUID = f4e5da9e-fb51-4d0d-900d-2559bd781b1d
+// res0: UUID = 8e8cae16-a1e0-4ced-bb30-70b962c9d08a
 
 dummy.dogs.`santa's-little-helper`
-// res1: UUID = cd6ac753-3d3c-4414-a5e6-d371484803b0
+// res1: UUID = d6829a6f-b34f-429f-ae44-04c0fa17ba7a
 
 dummy.cats.garfield
-// res2: String = "2DtX6-garfield"
+// res2: String = "uNaql-garfield"
 
 dummy.cats.sylvester
-// res3: String = "c9Z0R-sylvester"
+// res3: String = "kKVkq-sylvester"
 
 dummy.dates.`3 days ago`
-// res4: java.time.Instant = 2024-01-04T14:12:08.716113988Z
+// res4: java.time.Instant = 2024-03-11T12:09:04.354561159Z
 
 dummy.dates.yesterday
-// res5: java.time.Instant = 2024-01-06T14:12:08.716382231Z
+// res5: java.time.Instant = 2024-03-13T12:09:04.354902729Z
 ```
 
 The key of these generators is that values are cached, so if we try to use the
@@ -57,22 +57,22 @@ same "key" twice, it will give us the same value:
 
 ```scala
 dummy.dogs.snoopy
-// res6: UUID = f4e5da9e-fb51-4d0d-900d-2559bd781b1d
+// res6: UUID = 8e8cae16-a1e0-4ced-bb30-70b962c9d08a
 
 dummy.dogs.`santa's-little-helper`
-// res7: UUID = cd6ac753-3d3c-4414-a5e6-d371484803b0
+// res7: UUID = d6829a6f-b34f-429f-ae44-04c0fa17ba7a
 
 dummy.cats.garfield
-// res8: String = "2DtX6-garfield"
+// res8: String = "uNaql-garfield"
 
 dummy.cats.sylvester
-// res9: String = "c9Z0R-sylvester"
+// res9: String = "kKVkq-sylvester"
 
 dummy.dates.`3 days ago`
-// res10: java.time.Instant = 2024-01-04T14:12:08.716113988Z
+// res10: java.time.Instant = 2024-03-11T12:09:04.354561159Z
 
 dummy.dates.yesterday
-// res11: java.time.Instant = 2024-01-06T14:12:08.716382231Z
+// res11: java.time.Instant = 2024-03-13T12:09:04.354902729Z
 ```
 
 ### Accessing the cache
@@ -83,21 +83,32 @@ store.
 ```scala
 dummy.dogs.cache.all
 // res12: Map[String, UUID] = Map(
-//   "snoopy" -> f4e5da9e-fb51-4d0d-900d-2559bd781b1d,
-//   "santa's-little-helper" -> cd6ac753-3d3c-4414-a5e6-d371484803b0
+//   "snoopy" -> 8e8cae16-a1e0-4ced-bb30-70b962c9d08a,
+//   "santa's-little-helper" -> d6829a6f-b34f-429f-ae44-04c0fa17ba7a
 // )
 
 dummy.cats.cache.all
 // res13: Map[String, String] = Map(
-//   "sylvester" -> "c9Z0R-sylvester",
-//   "garfield" -> "2DtX6-garfield"
+//   "sylvester" -> "kKVkq-sylvester",
+//   "garfield" -> "uNaql-garfield"
 // )
 
 dummy.dates.cache.all
 // res14: Map[String, java.time.Instant] = Map(
-//   "yesterday" -> 2024-01-06T14:12:08.716382231Z,
-//   "3 days ago" -> 2024-01-04T14:12:08.716113988Z
+//   "yesterday" -> 2024-03-13T12:09:04.354902729Z,
+//   "3 days ago" -> 2024-03-11T12:09:04.354561159Z
 // )
+```
+
+There are also available some convenient methods to get values from the cache
+based on their name or value:
+
+
+```scala
+dummy.dogs.withName("snoopy")
+// res15: UUID = 8e8cae16-a1e0-4ced-bb30-70b962c9d08a
+dummy.cats.withValue(_.endsWith("garfield"))
+// res16: String = "uNaql-garfield"
 ```
 
 ## Contributors to this project 
