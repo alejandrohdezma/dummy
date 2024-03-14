@@ -64,6 +64,20 @@ class Dummy[A](creator: => A) extends Dynamic {
   /** The cache containing all the values created by this dummy object. */
   val cache: Cache[A] = Cache.fromConcurrentHashMap[A]
 
+  /** Returns a dummy value with the provided name without creating a new one.
+    *
+    * Throws a [[Dummy.NameNotFound]] if no value has previously been created with that name.
+    */
+  def withName(name: String): A =
+    cache.all.get(name).getOrElse(throw Dummy.NameNotFound) // scalafix:ok
+
+  /** Returns a dummy value from the cache that satisfies the provided predicate.
+    *
+    * Throws a [[Dummy.ValueNotFound]] if no value has previously been created that passes the predicate.
+    */
+  def withValue(predicate: A => Boolean): A =
+    cache.all.find { case (_, value) => predicate(value) }.getOrElse(throw Dummy.ValueNotFound)._2 // scalafix:ok
+
   def selectDynamic(name: String): A = cache.getOrSet(name, _ => creator)
 
   def apply(name: String): A = selectDynamic(name)
@@ -73,6 +87,10 @@ class Dummy[A](creator: => A) extends Dynamic {
 }
 
 object Dummy {
+
+  case object NameNotFound extends RuntimeException("Unable to find value with the provided name")
+
+  case object ValueNotFound extends RuntimeException("Unable to find value that satisfies the provided predicate")
 
   /** Creates a "dummy" object that allows generating dummy values for tests easily.
     *
@@ -250,6 +268,20 @@ object Dummy {
 
     /** The cache containing all the values created by this dummy object. */
     val cache: Cache[A] = Cache.fromConcurrentHashMap[A]
+
+    /** Returns a dummy value with the provided name without creating a new one.
+      *
+      * Throws a [[Dummy.NameNotFound]] if no value has previously been created with that name.
+      */
+    def withName(name: String): A =
+      cache.all.get(name).getOrElse(throw Dummy.NameNotFound) // scalafix:ok
+
+    /** Returns a dummy value from the cache that satisfies the provided predicate.
+      *
+      * Throws a [[Dummy.ValueNotFound]] if no value has previously been created that passes the predicate.
+      */
+    def withValue(predicate: A => Boolean): A =
+      cache.all.find { case (_, value) => predicate(value) }.getOrElse(throw Dummy.ValueNotFound)._2 // scalafix:ok
 
     def selectDynamic(name: String): A = cache.getOrSet(name, creator)
 
