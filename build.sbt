@@ -1,5 +1,5 @@
 ThisBuild / scalaVersion           := "2.13.14"
-ThisBuild / crossScalaVersions     := Seq("2.13.14", "3.3.2")
+ThisBuild / crossScalaVersions     := Seq("2.13.14", "3.3.3")
 ThisBuild / organization           := "com.alejandrohdezma"
 ThisBuild / versionPolicyIntention := Compatibility.BinaryAndSourceCompatible
 
