@@ -12,4 +12,4 @@ lazy val documentation = project
   .dependsOn(dummy)
 
 lazy val dummy = module
-  .settings(libraryDependencies += "org.scalameta" %% "munit" % "1.0.2" % Test)
+  .settings(libraryDependencies += "org.scalameta" %% "munit" % "1.0.3" % Test)
