@@ -1,5 +1,5 @@
-ThisBuild / scalaVersion           := "2.13.16"
-ThisBuild / crossScalaVersions     := Seq("2.13.16", "3.3.6")
+ThisBuild / scalaVersion           := "2.13.18"
+ThisBuild / crossScalaVersions     := Seq("2.13.18", "3.3.7")
 ThisBuild / organization           := "com.alejandrohdezma"
 ThisBuild / versionPolicyIntention := Compatibility.BinaryAndSourceCompatible
 
@@ -12,4 +12,4 @@ lazy val documentation = project
   .dependsOn(dummy)
 
 lazy val dummy = module
-  .settings(libraryDependencies += "org.scalameta" %% "munit" % "1.1.1" % Test)
+  .settings(libraryDependencies += "org.scalameta" %% "munit" % "1.2.1" % Test)
