@@ -5,7 +5,7 @@ Utility for creating dummy data for Scala tests
 Add the following line to your build.sbt file:
 
 ```sbt
-libraryDependencies += "com.alejandrohdezma" %% "dummy" % "0.6.1" % Test
+libraryDependencies += "com.alejandrohdezma" %% "dummy" % "0.7.0" % Test
 ```
 
 ## Usage
@@ -34,22 +34,61 @@ under the hood):
 
 ```scala
 dummy.dogs.snoopy
-// res0: UUID = 8e8cae16-a1e0-4ced-bb30-70b962c9d08a
+// res0: UUID = ad8545df-5a9b-4344-bf54-4a6471bc3fc5
 
 dummy.dogs.`santa's-little-helper`
-// res1: UUID = d6829a6f-b34f-429f-ae44-04c0fa17ba7a
+// res1: UUID = 893e0fc5-58aa-4aca-8d6f-910389b60e76
 
 dummy.cats.garfield
-// res2: String = "uNaql-garfield"
+// res2: String = "kD6mQ-garfield"
 
 dummy.cats.sylvester
-// res3: String = "kKVkq-sylvester"
+// res3: String = "McRHT-sylvester"
 
 dummy.dates.`3 days ago`
-// res4: java.time.Instant = 2024-03-11T12:09:04.354561159Z
+// res4: java.time.Instant = 2026-09-12T12:04:46.770991899Z
 
 dummy.dates.yesterday
-// res5: java.time.Instant = 2024-03-13T12:09:04.354902729Z
+// res5: java.time.Instant = 2026-09-14T12:04:46.771807915Z
+
+dummy.dates.`last monday`
+// res6: java.time.Instant = 2026-09-14T12:04:46.772732543Z
+```
+
+Dates are relative to the current time; pass a `ZonedDateTime` to
+`Dummy.fromNaturalLanguageDate` to pin them to a fixed one instead.
+
+### Dates as other types
+
+`fromNaturalLanguageDate` produces `Instant`s. Use `map` to get any other
+representation, such as a `LocalDate`, a `ZonedDateTime` or a formatted
+string. Combined with a pinned date this keeps tests that depend on the day
+of the week deterministic:
+
+```scala
+import java.time.ZoneOffset.UTC
+import java.time.ZonedDateTime
+
+object pinned {
+
+  val anchor = ZonedDateTime.parse("2026-09-15T10:00:00Z")
+
+  val days = Dummy.fromNaturalLanguageDate(anchor).map(_.atZone(UTC).toLocalDate)
+
+  val stamps = Dummy.fromNaturalLanguageDate(anchor).map(_.atZone(UTC).toLocalDate.toString)
+
+}
+```
+
+```scala
+pinned.days.yesterday
+// res7: java.time.LocalDate = 2026-09-14
+
+pinned.days.`last monday`
+// res8: java.time.LocalDate = 2026-09-14
+
+pinned.stamps.`2 weeks ago`
+// res9: String = "2026-09-01"
 ```
 
 The key of these generators is that values are cached, so if we try to use the
@@ -57,22 +96,22 @@ same "key" twice, it will give us the same value:
 
 ```scala
 dummy.dogs.snoopy
-// res6: UUID = 8e8cae16-a1e0-4ced-bb30-70b962c9d08a
+// res10: UUID = ad8545df-5a9b-4344-bf54-4a6471bc3fc5
 
 dummy.dogs.`santa's-little-helper`
-// res7: UUID = d6829a6f-b34f-429f-ae44-04c0fa17ba7a
+// res11: UUID = 893e0fc5-58aa-4aca-8d6f-910389b60e76
 
 dummy.cats.garfield
-// res8: String = "uNaql-garfield"
+// res12: String = "kD6mQ-garfield"
 
 dummy.cats.sylvester
-// res9: String = "kKVkq-sylvester"
+// res13: String = "McRHT-sylvester"
 
 dummy.dates.`3 days ago`
-// res10: java.time.Instant = 2024-03-11T12:09:04.354561159Z
+// res14: java.time.Instant = 2026-09-12T12:04:46.770991899Z
 
 dummy.dates.yesterday
-// res11: java.time.Instant = 2024-03-13T12:09:04.354902729Z
+// res15: java.time.Instant = 2026-09-14T12:04:46.771807915Z
 ```
 
 ### Accessing the cache
@@ -82,21 +121,22 @@ store.
 
 ```scala
 dummy.dogs.cache.all
-// res12: Map[String, UUID] = Map(
-//   "snoopy" -> 8e8cae16-a1e0-4ced-bb30-70b962c9d08a,
-//   "santa's-little-helper" -> d6829a6f-b34f-429f-ae44-04c0fa17ba7a
+// res16: Map[String, UUID] = Map(
+//   "snoopy" -> ad8545df-5a9b-4344-bf54-4a6471bc3fc5,
+//   "santa's-little-helper" -> 893e0fc5-58aa-4aca-8d6f-910389b60e76
 // )
 
 dummy.cats.cache.all
-// res13: Map[String, String] = Map(
-//   "sylvester" -> "kKVkq-sylvester",
-//   "garfield" -> "uNaql-garfield"
+// res17: Map[String, String] = Map(
+//   "sylvester" -> "McRHT-sylvester",
+//   "garfield" -> "kD6mQ-garfield"
 // )
 
 dummy.dates.cache.all
-// res14: Map[String, java.time.Instant] = Map(
-//   "yesterday" -> 2024-03-13T12:09:04.354902729Z,
-//   "3 days ago" -> 2024-03-11T12:09:04.354561159Z
+// res18: Map[String, java.time.Instant] = Map(
+//   "yesterday" -> 2026-09-14T12:04:46.771807915Z,
+//   "last monday" -> 2026-09-14T12:04:46.772732543Z,
+//   "3 days ago" -> 2026-09-12T12:04:46.770991899Z
 // )
 ```
 
@@ -106,9 +146,9 @@ based on their name or value:
 
 ```scala
 dummy.dogs.withName("snoopy")
-// res15: UUID = 8e8cae16-a1e0-4ced-bb30-70b962c9d08a
+// res19: UUID = ad8545df-5a9b-4344-bf54-4a6471bc3fc5
 dummy.cats.withValue(_.endsWith("garfield"))
-// res16: String = "uNaql-garfield"
+// res20: String = "kD6mQ-garfield"
 ```
 
 ## Contributors to this project 
