@@ -16,10 +16,12 @@
 
 package com.alejandrohdezma.dummy
 
+import java.time.DayOfWeek
 import java.time.Instant
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 import java.time.temporal.ChronoUnit._
+import java.time.temporal.TemporalAdjusters
 import java.time.temporal.TemporalUnit
 
 import scala.language.dynamics
@@ -167,13 +169,22 @@ object Dummy {
     *
     * Allowed values are:
     *
+    *   - `now` / `today`
     *   - `yesterday` / `tomorrow`
     *   - `N UNIT ago/forward`
     *   - `next/last UNIT`
+    *   - `next/last WEEKDAY`
     *
     * N will always be a positive number
     *
     * UNIT will always be a Java `ChronoUnit` in lowercase (singular or plural)
+    *
+    * WEEKDAY will always be an English day of the week in lowercase (`monday`, `tuesday`...). `next monday` is the
+    * first Monday strictly after the current date and `last monday` the last one strictly before it, so on a Monday
+    * both are a week away.
+    *
+    * Values are relative to the current date and time. Use the overload taking a `ZonedDateTime` to pin them to a fixed
+    * one instead, so tests that depend on the day of the week stay deterministic.
     *
     * @example
     *   {{{
@@ -189,25 +200,75 @@ object Dummy {
     *    dummy.dates.`5 days ago`
     *    dummy.dates.`yesterday`
     *    dummy.dates.`last year`
+    *    dummy.dates.`next monday`
     *    ```
     *   }}}
     */
-  def fromNaturalLanguageDate(): Dummy.WithName[Instant] = withName {
-    case s"${Number(quantity)} ${TimeUnit(unit)} ago"     => ZonedDateTime.now().minus(quantity, unit)
-    case s"${Number(quantity)} ${TimeUnit(unit)} forward" => ZonedDateTime.now().plus(quantity, unit)
-    case "yesterday"                                      => ZonedDateTime.now().minus(1, DAYS)
-    case "tomorrow"                                       => ZonedDateTime.now().plus(1, DAYS)
-    case s"next ${TimeUnit(unit)}"                        => ZonedDateTime.now().plus(1, unit)
-    case s"last ${TimeUnit(unit)}"                        => ZonedDateTime.now().minus(1, unit)
+  def fromNaturalLanguageDate(): Dummy.WithName[Instant] = fromNaturalLanguageDate(ZonedDateTime.now())
+
+  /** Creates a "dummy" object that allows generating dummy instant values from natural language for tests easily,
+    * relative to the provided date and time instead of the current one. See the parameterless overload for the accepted
+    * expressions.
+    *
+    * @param now
+    *   The date and time every expression is relative to. Evaluated each time a new value is created.
+    *
+    * @example
+    *   {{{
+    *    ```scala
+    *    import com.alejandrohdezma.dummy.Dummy
+    *    import java.time.ZonedDateTime
+    *
+    *    object dummy {
+    *
+    *      val dates = Dummy.fromNaturalLanguageDate(ZonedDateTime.parse("2026-09-15T10:00:00Z"))
+    *
+    *    }
+    *
+    *    dummy.dates.`yesterday`   // 2026-09-14T10:00:00Z
+    *    dummy.dates.`last monday` // 2026-09-14T10:00:00Z
+    *    ```
+    *   }}}
+    */
+  def fromNaturalLanguageDate(now: => ZonedDateTime): Dummy.WithName[Instant] = withName {
+    case "now" | "today"                                  => now
+    case s"${Number(quantity)} ${TimeUnit(unit)} ago"     => now.minus(quantity, unit)
+    case s"${Number(quantity)} ${TimeUnit(unit)} forward" => now.plus(quantity, unit)
+    case "yesterday"                                      => now.minus(1, DAYS)
+    case "tomorrow"                                       => now.plus(1, DAYS)
+    case s"next ${Weekday(day)}"                          => now.`with`(TemporalAdjusters.next(day))
+    case s"last ${Weekday(day)}"                          => now.`with`(TemporalAdjusters.previous(day))
+    case s"next ${TimeUnit(unit)}"                        => now.plus(1, unit)
+    case s"last ${TimeUnit(unit)}"                        => now.minus(1, unit)
     case string                                           => throw IllegalDateException(string) // scalafix:ok
   }.map(_.toInstant())
 
   final case class IllegalDateException(string: String)
-      extends RuntimeException(s"Unable to convert `$string` to a valid instant")
+      extends RuntimeException(
+        s"Unable to convert `$string` to a valid instant. Accepted expressions are `now`, `today`, `yesterday`, " +
+          "`tomorrow`, `N UNIT ago`, `N UNIT forward`, `next UNIT`, `last UNIT`, `next WEEKDAY` and `last WEEKDAY`, " +
+          "where N is a positive number, UNIT is one of nanos, micros, millis, seconds, minutes, hours, days, weeks, " +
+          "months or years (singular or plural) and WEEKDAY is an English day of the week"
+      )
 
   object Number {
 
     def unapply(string: String): Option[Long] = string.toLongOption
+
+  }
+
+  object Weekday {
+
+    def unapply(string: String): Option[DayOfWeek] = string.toLowerCase match {
+      case "monday"    => Some(DayOfWeek.MONDAY)
+      case "tuesday"   => Some(DayOfWeek.TUESDAY)
+      case "wednesday" => Some(DayOfWeek.WEDNESDAY)
+      case "thursday"  => Some(DayOfWeek.THURSDAY)
+      case "friday"    => Some(DayOfWeek.FRIDAY)
+      case "saturday"  => Some(DayOfWeek.SATURDAY)
+      case "sunday"    => Some(DayOfWeek.SUNDAY)
+      case _           => None
+    }
 
   }
 

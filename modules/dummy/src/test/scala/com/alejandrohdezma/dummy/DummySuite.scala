@@ -20,6 +20,7 @@ import java.time.Instant
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit._
 import java.util.UUID
+import java.util.concurrent.atomic.AtomicInteger
 
 import scala.util.Random
 
@@ -124,6 +125,38 @@ class DummySuite extends FunSuite {
     assertInstant(dummy("last year"), ZonedDateTime.now().minusYears(1).toInstant)
   }
 
+  test("Dummy.fromNaturalLanguageDate resolves weekdays and `today` relative to the provided date") {
+    val tuesday = ZonedDateTime.parse("2026-09-15T10:00:00Z")
+
+    val dummy = Dummy.fromNaturalLanguageDate(tuesday)
+
+    assertEquals(dummy.`today`, tuesday.toInstant)
+    assertEquals(dummy.`now`, tuesday.toInstant)
+    assertEquals(dummy.`yesterday`, Instant.parse("2026-09-14T10:00:00Z"))
+    assertEquals(dummy.`last monday`, Instant.parse("2026-09-14T10:00:00Z"))
+    assertEquals(dummy.`last tuesday`, Instant.parse("2026-09-08T10:00:00Z"))
+    assertEquals(dummy.`next tuesday`, Instant.parse("2026-09-22T10:00:00Z"))
+    assertEquals(dummy.`next Friday`, Instant.parse("2026-09-18T10:00:00Z"))
+    assertEquals(dummy.`2 weeks ago`, Instant.parse("2026-09-01T10:00:00Z"))
+    assertEquals(dummy.`last month`, Instant.parse("2026-08-15T10:00:00Z"))
+  }
+
+  test("Dummy.fromNaturalLanguageDate evaluates the provided date every time a value is created") {
+    val calls = new AtomicInteger(0)
+
+    val dummy = Dummy.fromNaturalLanguageDate {
+      calls.incrementAndGet()
+      ZonedDateTime.parse("2026-09-15T10:00:00Z")
+    }
+
+    val yesterday = List.fill(2)(dummy.`yesterday`).distinct
+    val tomorrow  = dummy.`tomorrow`
+
+    assertEquals(yesterday, List(Instant.parse("2026-09-14T10:00:00Z")))
+    assertEquals(tomorrow, Instant.parse("2026-09-16T10:00:00Z"))
+    assertEquals(calls.get(), 2)
+  }
+
   test("Dummy.WithName#map allows transforming the returned type") {
     val dummy = Dummy.fromNaturalLanguageDate().map(_.truncatedTo(DAYS))
 
@@ -172,7 +205,12 @@ class DummySuite extends FunSuite {
   test("Dummy.fromNaturalLanguageDate fails if provided expression is not correct") {
     val dummy = Dummy.fromNaturalLanguageDate()
 
-    interceptMessage[Dummy.IllegalDateException]("Unable to convert `this is not valid` to a valid instant") {
+    val expected = "Unable to convert `this is not valid` to a valid instant. Accepted expressions are `now`, " +
+      "`today`, `yesterday`, `tomorrow`, `N UNIT ago`, `N UNIT forward`, `next UNIT`, `last UNIT`, `next WEEKDAY` " +
+      "and `last WEEKDAY`, where N is a positive number, UNIT is one of nanos, micros, millis, seconds, minutes, " +
+      "hours, days, weeks, months or years (singular or plural) and WEEKDAY is an English day of the week"
+
+    interceptMessage[Dummy.IllegalDateException](expected) {
       dummy.`this is not valid`
     }
   }

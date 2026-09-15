@@ -44,6 +44,41 @@ dummy.cats.sylvester
 dummy.dates.`3 days ago`
 
 dummy.dates.yesterday
+
+dummy.dates.`last monday`
+```
+
+Dates are relative to the current time; pass a `ZonedDateTime` to
+`Dummy.fromNaturalLanguageDate` to pin them to a fixed one instead.
+
+### Dates as other types
+
+`fromNaturalLanguageDate` produces `Instant`s. Use `map` to get any other
+representation, such as a `LocalDate`, a `ZonedDateTime` or a formatted
+string. Combined with a pinned date this keeps tests that depend on the day
+of the week deterministic:
+
+```scala mdoc:silent
+import java.time.ZoneOffset.UTC
+import java.time.ZonedDateTime
+
+object pinned {
+
+  val anchor = ZonedDateTime.parse("2026-09-15T10:00:00Z")
+
+  val days = Dummy.fromNaturalLanguageDate(anchor).map(_.atZone(UTC).toLocalDate)
+
+  val stamps = Dummy.fromNaturalLanguageDate(anchor).map(_.atZone(UTC).toLocalDate.toString)
+
+}
+```
+
+```scala mdoc
+pinned.days.yesterday
+
+pinned.days.`last monday`
+
+pinned.stamps.`2 weeks ago`
 ```
 
 The key of these generators is that values are cached, so if we try to use the
